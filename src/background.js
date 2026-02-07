@@ -6,3 +6,4 @@ actionAPI.onClicked.addListener(() => {
   runtimeAPI.openOptionsPage();
 });
 
+

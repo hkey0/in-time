@@ -2,8 +2,6 @@ const STORAGE_KEY_HOURLY = "hourlyWage";
 const STORAGE_KEY_DAILY_HOURS = "dailyHours";
 const ORIGINAL_PRICE_ATTR = "data-original-price";
 
-console.log("[Amazon Time] Content script loaded");
-
 const parsePrice = (text) => {
   if (!text) return null;
   // Handle various formats: $19.99, €19,99, £19.99, ₹1,999.00, etc.
@@ -143,7 +141,6 @@ const replacePrice = (container, timeLabel) => {
 const applyToPrices = (hourlyWage, workdayHours = 8) => {
   // Find all .a-price containers
   const priceContainers = document.querySelectorAll(".a-price");
-  console.log(`[Amazon Time] Found ${priceContainers.length} .a-price elements`);
 
   priceContainers.forEach((container) => {
     // Get original price from stored attribute or current offscreen text
@@ -172,7 +169,6 @@ const applyToPrices = (hourlyWage, workdayHours = 8) => {
   const otherPrices = document.querySelectorAll(
     "#corePrice_feature_div .a-offscreen, #corePriceDisplay_desktop_feature_div .a-offscreen"
   );
-  console.log(`[Amazon Time] Found ${otherPrices.length} other price elements`);
 
   otherPrices.forEach((el) => {
     if (!el.hasAttribute(ORIGINAL_PRICE_ATTR)) {
@@ -215,17 +211,14 @@ const startObserver = () => {
 const storageAPI = typeof browser !== "undefined" ? browser.storage : chrome.storage;
 
 const init = async () => {
-  console.log("[Amazon Time] Initializing...");
   try {
     const stored = await storageAPI.sync.get([STORAGE_KEY_HOURLY, STORAGE_KEY_DAILY_HOURS]);
     currentWage = stored[STORAGE_KEY_HOURLY] ?? null;
     currentDailyHours = stored[STORAGE_KEY_DAILY_HOURS] ?? 8;
-    console.log(`[Amazon Time] Loaded wage: ${currentWage}, daily hours: ${currentDailyHours}`);
     applyToPrices(currentWage, currentDailyHours);
     startObserver();
-    console.log("[Amazon Time] Observer started");
   } catch (err) {
-    console.error("[Amazon Time] Init error:", err);
+    // Silent fail - extension will retry on page changes
   }
 };
 
@@ -233,12 +226,10 @@ storageAPI.onChanged.addListener((changes, areaName) => {
   if (areaName !== "sync") return;
   if (changes[STORAGE_KEY_HOURLY]) {
     currentWage = changes[STORAGE_KEY_HOURLY].newValue ?? null;
-    console.log(`[Amazon Time] Wage updated: ${currentWage}`);
     scheduleApply();
   }
   if (changes[STORAGE_KEY_DAILY_HOURS]) {
     currentDailyHours = changes[STORAGE_KEY_DAILY_HOURS].newValue ?? 8;
-    console.log(`[Amazon Time] Daily hours updated: ${currentDailyHours}`);
     scheduleApply();
   }
 });

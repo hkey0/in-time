@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Amazon Time Prices",
-  "version": "0.1.0",
+  "name": "Amazon Prices in Time",
+  "version": "1.0.0",
   "description": "Show Amazon prices in time based on your hourly wage.",
   "browser_specific_settings": {
     "gecko": {
-      "id": "amazon-time@example.com"
+      "id": "{a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d}"
     }
   },
   "permissions": ["storage"],
